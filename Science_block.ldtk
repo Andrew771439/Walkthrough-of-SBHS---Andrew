@@ -323,7 +323,7 @@
 		}
 	], "entities": [
 		{
-			"identifier": "Interactbles",
+			"identifier": "Interactables",
 			"uid": 11,
 			"tags": [],
 			"exportToToc": false,
@@ -1072,7 +1072,7 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "Interactbles",
+							"__identifier": "Interactables",
 							"__grid": [18,7],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -1101,7 +1101,7 @@
 							"__worldY": -1184
 						},
 						{
-							"__identifier": "Interactbles",
+							"__identifier": "Interactables",
 							"__grid": [19,49],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -1130,7 +1130,7 @@
 							"__worldY": -512
 						},
 						{
-							"__identifier": "Interactbles",
+							"__identifier": "Interactables",
 							"__grid": [69,7],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -1159,7 +1159,7 @@
 							"__worldY": -1184
 						},
 						{
-							"__identifier": "Interactbles",
+							"__identifier": "Interactables",
 							"__grid": [61,42],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -1188,7 +1188,7 @@
 							"__worldY": -624
 						},
 						{
-							"__identifier": "Interactbles",
+							"__identifier": "Interactables",
 							"__grid": [82,17],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -1217,7 +1217,7 @@
 							"__worldY": -1024
 						},
 						{
-							"__identifier": "Interactbles",
+							"__identifier": "Interactables",
 							"__grid": [36,9],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -1246,7 +1246,7 @@
 							"__worldY": -1152
 						},
 						{
-							"__identifier": "Interactbles",
+							"__identifier": "Interactables",
 							"__grid": [39,55],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -1428,9 +1428,9 @@
 							"height": 45,
 							"defUid": 30,
 							"px": [144,528],
-							"fieldInstances": [{ "__identifier": "SpawnID", "__type": "String", "__value": "Intial", "__tile": null, "defUid": 31, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "SpawnID", "__type": "String", "__value": "Science_Block_Initial", "__tile": null, "defUid": 31, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["Intial"]
+								"params": ["Science_Block_Initial"]
 							}] }],
 							"__worldX": -1488,
 							"__worldY": -768
