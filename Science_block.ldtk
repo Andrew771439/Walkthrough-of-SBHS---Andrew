@@ -36,7 +36,7 @@
 	"backupOnSave": false,
 	"backupLimit": 10,
 	"backupRelPath": null,
-	"levelNamePattern": "Level_%idx",
+	"levelNamePattern": "Science_block",
 	"tutorialDesc": null,
 	"customCommands": [],
 	"flags": [],
@@ -1027,7 +1027,7 @@
 	], "enums": [], "externalEnums": [], "levelFields": [] },
 	"levels": [
 		{
-			"identifier": "Level_0",
+			"identifier": "Science_block",
 			"iid": "73e98b30-96d0-11f1-89d4-4398ca1db7ca",
 			"uid": 0,
 			"worldX": -1632,
