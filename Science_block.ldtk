@@ -253,7 +253,7 @@
 		},
 		{
 			"__type": "IntGrid",
-			"identifier": "Collisons",
+			"identifier": "Collisions",
 			"type": "IntGrid",
 			"uid": 7,
 			"doc": null,
