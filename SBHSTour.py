@@ -89,6 +89,35 @@ player_image = pygame.transform.scale(
 MAP_WIDTH = map_image.get_width()
 MAP_HEIGHT = map_image.get_height()
 
+# -------------------------
+# LOAD COLLISIONS
+# -------------------------
+
+collision_rects = []
+
+for layer in science_level["layerInstances"]:
+    if layer["__identifier"] == "Collisions":
+
+        grid_size = layer["__gridSize"]
+        cols = layer["__cWid"]
+
+        for index, value in enumerate(layer["intGridCsv"]):
+            if value == 1:
+
+                grid_x = index % cols
+                grid_y = index // cols
+
+                collision_rects.append(
+                    pygame.Rect(
+                        grid_x * grid_size,
+                        grid_y * grid_size,
+                        grid_size,
+                        grid_size
+                    )
+                )
+
+print("Collision cells loaded:", len(collision_rects))
+
 
 # -------------------------
 # FIND PLAYER SPAWN
@@ -134,6 +163,35 @@ player_rect = pygame.Rect(
     40,
     40
 )
+
+# -------------------------
+# COLLISION FUNCTIONS
+# -------------------------
+
+def move_player_x(amount):
+    player_rect.x += amount
+
+    for wall in collision_rects:
+        if player_rect.colliderect(wall):
+
+            if amount > 0:
+                player_rect.right = wall.left
+
+            elif amount < 0:
+                player_rect.left = wall.right
+
+
+def move_player_y(amount):
+    player_rect.y += amount
+
+    for wall in collision_rects:
+        if player_rect.colliderect(wall):
+
+            if amount > 0:
+                player_rect.bottom = wall.top
+
+            elif amount < 0:
+                player_rect.top = wall.bottom
 
 
 # -------------------------
@@ -189,8 +247,8 @@ while running:
         move_x += PLAYER_SPEED
 
 
-    player_rect.x += move_x
-    player_rect.y += move_y
+    move_player_x(move_x)
+    move_player_y(move_y)
 
 
     # -------------------------
