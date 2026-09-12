@@ -326,6 +326,23 @@ while running:
         )
     )
 
+    # -------------------------
+# SHOW COLLISION BOXES
+# -------------------------
+
+for wall in collision_rects:
+    pygame.draw.rect(
+        screen,
+        (255, 0, 0),
+        (
+            wall.x - camera_x,
+            wall.y - camera_y,
+            wall.width,
+            wall.height
+        ),
+        3
+    )
+
 
 
     # -------------------------
