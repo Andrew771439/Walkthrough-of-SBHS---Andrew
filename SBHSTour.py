@@ -56,7 +56,6 @@ print("LDtk map loaded!")
 science_level = None
 
 for level in map_data["levels"]:
-
     if level["identifier"] == "Science_block":
         science_level = level
         break
@@ -79,8 +78,6 @@ player_image = pygame.image.load(
     player_image_path
 ).convert_alpha()
 
-
-# Make player a sensible size
 player_image = pygame.transform.scale(
     player_image,
     (40, 40)
@@ -89,11 +86,15 @@ player_image = pygame.transform.scale(
 MAP_WIDTH = map_image.get_width()
 MAP_HEIGHT = map_image.get_height()
 
+
 # -------------------------
 # LOAD COLLISIONS
 # -------------------------
 
 collision_rects = []
+
+COLLISION_OFFSET_X = -63
+COLLISION_OFFSET_Y = -35
 
 for layer in science_level["layerInstances"]:
     if layer["__identifier"] == "Collisions":
@@ -109,8 +110,8 @@ for layer in science_level["layerInstances"]:
 
                 collision_rects.append(
                     pygame.Rect(
-                        grid_x * grid_size,
-                        grid_y * grid_size,
+                        grid_x * grid_size + COLLISION_OFFSET_X,
+                        grid_y * grid_size + COLLISION_OFFSET_Y,
                         grid_size,
                         grid_size
                     )
@@ -163,6 +164,7 @@ player_rect = pygame.Rect(
     40,
     40
 )
+
 
 # -------------------------
 # COLLISION FUNCTIONS
@@ -282,14 +284,11 @@ while running:
         - HEIGHT // 2
     )
 
-
-    # Stop camera going outside map
-
     camera_x = max(
         0,
         min(
             camera_x,
-            MAP_WIDTH - WIDTH
+            max(0, MAP_WIDTH - WIDTH)
         )
     )
 
@@ -297,7 +296,7 @@ while running:
         0,
         min(
             camera_y,
-            MAP_HEIGHT - HEIGHT
+            max(0, MAP_HEIGHT - HEIGHT)
         )
     )
 
@@ -326,23 +325,23 @@ while running:
         )
     )
 
+
     # -------------------------
-# SHOW COLLISION BOXES
-# -------------------------
+    # SHOW COLLISION BOXES
+    # -------------------------
 
-for wall in collision_rects:
-    pygame.draw.rect(
-        screen,
-        (255, 0, 0),
-        (
-            wall.x - camera_x,
-            wall.y - camera_y,
-            wall.width,
-            wall.height
-        ),
-        3
-    )
-
+    for wall in collision_rects:
+        pygame.draw.rect(
+            screen,
+            (255, 0, 0),
+            (
+                wall.x - camera_x,
+                wall.y - camera_y,
+                wall.width,
+                wall.height
+            ),
+            2
+        )
 
 
     # -------------------------
@@ -352,7 +351,6 @@ for wall in collision_rects:
     pygame.display.flip()
 
     clock.tick(60)
-
 
 
 pygame.quit()
