@@ -124,8 +124,8 @@ print("Collision cells loaded:", len(collision_rects))
 # FIND PLAYER SPAWN
 # -------------------------
 
-player_x = 144
-player_y = 528
+player_x = 0
+player_y = -5
 
 for layer in science_level["layerInstances"]:
 
@@ -325,23 +325,6 @@ while running:
         )
     )
 
-
-    # -------------------------
-    # SHOW COLLISION BOXES
-    # -------------------------
-
-    for wall in collision_rects:
-        pygame.draw.rect(
-            screen,
-            (255, 0, 0),
-            (
-                wall.x - camera_x,
-                wall.y - camera_y,
-                wall.width,
-                wall.height
-            ),
-            2
-        )
 
 
     # -------------------------
