@@ -4,9 +4,9 @@ import os
 
 pygame.init()
 
-# -------------------------
+
 # WINDOW
-# -------------------------
+
 
 WIDTH = 1580
 HEIGHT = 920
@@ -17,9 +17,9 @@ pygame.display.set_caption("SBHS Tour")
 clock = pygame.time.Clock()
 
 
-# -------------------------
+
 # FILE PATHS
-# -------------------------
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -43,10 +43,38 @@ player_image_path = os.path.join(
     "Science_Student.png"
 )
 
+biology_image_path = os.path.join(
+    BASE_DIR,
+    "Science block",
+    "Assets",
+    "Biology_Teacher.png"
+)
 
-# -------------------------
+chemistry_image_path = os.path.join(
+    BASE_DIR,
+    "Science block",
+    "Assets",
+    "Chemistry_Teacher.png"
+)
+
+physics_image_path = os.path.join(
+    BASE_DIR,
+    "Science block",
+    "Assets",
+    "Physics_Teacher.png"
+)
+
+student_image_path = os.path.join(
+    BASE_DIR,
+    "Science block",
+    "Assets",
+    "Science_Student.png"
+)
+
+
+
 # LOAD LDTK
-# -------------------------
+
 
 with open(ldtk_path, "r") as file:
     map_data = json.load(file)
@@ -66,9 +94,9 @@ if science_level is None:
     raise SystemExit
 
 
-# -------------------------
+
 # LOAD IMAGES
-# -------------------------
+
 
 map_image = pygame.image.load(
     map_image_path
@@ -87,9 +115,11 @@ MAP_WIDTH = map_image.get_width()
 MAP_HEIGHT = map_image.get_height()
 
 
-# -------------------------
+
+
+
 # LOAD COLLISIONS
-# -------------------------
+
 
 collision_rects = []
 
@@ -120,9 +150,9 @@ for layer in science_level["layerInstances"]:
 print("Collision cells loaded:", len(collision_rects))
 
 
-# -------------------------
+
 # FIND PLAYER SPAWN
-# -------------------------
+
 
 player_x = 0
 player_y = -5
@@ -152,9 +182,9 @@ for layer in science_level["layerInstances"]:
                         )
 
 
-# -------------------------
+
 # PLAYER SETTINGS
-# -------------------------
+
 
 PLAYER_SPEED = 4
 
@@ -166,9 +196,9 @@ player_rect = pygame.Rect(
 )
 
 
-# -------------------------
+
 # COLLISION FUNCTIONS
-# -------------------------
+
 
 def move_player_x(amount):
     player_rect.x += amount
@@ -196,25 +226,25 @@ def move_player_y(amount):
                 player_rect.top = wall.bottom
 
 
-# -------------------------
+
 # CAMERA
-# -------------------------
+
 
 camera_x = 0
 camera_y = 0
 
 
-# -------------------------
+
 # MAIN LOOP
-# -------------------------
+
 
 running = True
 
 while running:
 
-    # -------------------------
+    
     # EVENTS
-    # -------------------------
+    
 
     for event in pygame.event.get():
 
@@ -227,9 +257,9 @@ while running:
                 running = False
 
 
-    # -------------------------
+   
     # PLAYER MOVEMENT
-    # -------------------------
+   
 
     keys = pygame.key.get_pressed()
 
@@ -253,9 +283,9 @@ while running:
     move_player_y(move_y)
 
 
-    # -------------------------
+   
     # KEEP PLAYER ON MAP
-    # -------------------------
+   
 
     if player_rect.left < 0:
         player_rect.left = 0
@@ -270,9 +300,9 @@ while running:
         player_rect.bottom = MAP_HEIGHT
 
 
-    # -------------------------
+   
     # CAMERA FOLLOWS PLAYER
-    # -------------------------
+   
 
     camera_x = (
         player_rect.centerx
@@ -301,9 +331,9 @@ while running:
     )
 
 
-    # -------------------------
+   
     # DRAW MAP
-    # -------------------------
+    
 
     screen.fill((30, 30, 30))
 
@@ -313,9 +343,9 @@ while running:
     )
 
 
-    # -------------------------
+    
     # DRAW PLAYER
-    # -------------------------
+    
 
     screen.blit(
         player_image,
@@ -327,9 +357,9 @@ while running:
 
 
 
-    # -------------------------
+    
     # UPDATE DISPLAY
-    # -------------------------
+    
 
     pygame.display.flip()
 
