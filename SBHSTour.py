@@ -389,30 +389,32 @@ while running:
 
     # DRAW NPCS
 
+        # DRAW NPCS
+
     for npc in npcs:
 
-     if npc["id"] == "Biology_teacher":
-        image = biology_image
+        if npc["id"] == "Biology_teacher":
+            image = biology_image
 
-     elif npc["id"] == "Chemistry_teacher":
-        image = chemistry_image
+        elif npc["id"] == "Chemistry_teacher":
+            image = chemistry_image
 
-     elif npc["id"] == "Physics_teacher":
-        image = physics_image
+        elif npc["id"] == "Physics_teacher":
+            image = physics_image
 
-     elif npc["id"] == "Student":
-        image = student_image
+        elif npc["id"] == "Student":
+            image = student_image
 
-    else:
-        continue
+        else:
+            continue
 
-    screen.blit(
-        image,
-        (
-            npc["x"] - camera_x,
-            npc["y"] - camera_y
+        screen.blit(
+            image,
+            (
+                npc["x"] - camera_x,
+                npc["y"] - camera_y
+            )
         )
-    )
 
 
 
