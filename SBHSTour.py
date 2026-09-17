@@ -114,6 +114,15 @@ player_image = pygame.transform.scale(
 MAP_WIDTH = map_image.get_width()
 MAP_HEIGHT = map_image.get_height()
 
+biology_image = pygame.image.load(biology_image_path).convert_alpha()
+chemistry_image = pygame.image.load(chemistry_image_path).convert_alpha()
+physics_image = pygame.image.load(physics_image_path).convert_alpha()
+student_image = pygame.image.load(student_image_path).convert_alpha()
+
+biology_image = pygame.transform.scale(biology_image, (40, 40))
+chemistry_image = pygame.transform.scale(chemistry_image, (40, 40))
+physics_image = pygame.transform.scale(physics_image, (40, 40))
+student_image = pygame.transform.scale(student_image, (40, 40))
 
 
 
@@ -224,6 +233,29 @@ def move_player_y(amount):
 
             elif amount < 0:
                 player_rect.top = wall.bottom
+
+# LOAD NPC POSITIONS
+
+npcs = []
+
+for layer in science_level["layerInstances"]:
+    if layer["__identifier"] == "Spawn_and_teleport":
+
+        for entity in layer["entityInstances"]:
+            if entity["__identifier"] == "Sprites":
+
+                npc_id = None
+
+                for field in entity["fieldInstances"]:
+                    if field["__identifier"] == "NPCid":
+                        npc_id = field["__value"]
+
+                if npc_id is not None:
+                    npcs.append({
+                        "id": npc_id,
+                        "x": entity["px"][0],
+                        "y": entity["px"][1]
+                    })
 
 
 
@@ -352,6 +384,33 @@ while running:
         (
             player_rect.x - camera_x,
             player_rect.y - camera_y
+        )
+    )
+
+    # DRAW NPCS
+
+    for npc in npcs:
+
+     if npc["id"] == "Biology_teacher":
+        image = biology_image
+
+     elif npc["id"] == "Chemistry_teacher":
+        image = chemistry_image
+
+     elif npc["id"] == "Physics_teacher":
+        image = physics_image
+
+     elif npc["id"] == "Student":
+        image = student_image
+
+    else:
+        continue
+
+    screen.blit(
+        image,
+        (
+            npc["x"] - camera_x,
+            npc["y"] - camera_y
         )
     )
 
