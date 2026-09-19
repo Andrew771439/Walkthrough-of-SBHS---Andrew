@@ -281,12 +281,27 @@ camera_y = 0
 # INTERACTION
 
 font = pygame.font.Font(None, 32)
+small_font = pygame.font.Font(None, 26)
 
 show_dialogue = False
 dialogue_text = ""
 dialogue_name = ""
 
-INTERACTION_DISTANCE = 500
+INTERACTION_DISTANCE = 30
+
+dialogue_box = pygame.Rect(
+    150,
+    HEIGHT - 180,
+    WIDTH - 300,
+    120
+)
+
+close_button = pygame.Rect(
+    dialogue_box.right - 100,
+    dialogue_box.y + 15,
+    75,
+    35
+)
 
 
 # MAIN LOOP
@@ -298,7 +313,6 @@ while running:
 
     
     # EVENTS
-    
 
     for event in pygame.event.get():
 
@@ -341,6 +355,15 @@ while running:
                         show_dialogue = True
                         break
 
+     # CLOSE DIALOGUE BUTTON
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+
+            if event.button == 1:
+
+                if show_dialogue and close_button.collidepoint(event.pos):
+                    show_dialogue = False
+
 
    
     # PLAYER MOVEMENT
@@ -366,6 +389,9 @@ while running:
 
     move_player_x(move_x)
     move_player_y(move_y)
+
+    if move_x != 0 or move_y != 0:
+     show_dialogue = False
 
 
    
