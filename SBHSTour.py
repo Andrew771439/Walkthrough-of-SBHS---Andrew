@@ -393,6 +393,34 @@ while running:
     if move_x != 0 or move_y != 0:
      show_dialogue = False
 
+        # CHECK FOR NEARBY NPC
+
+    nearby_npc = None
+
+    for npc in npcs:
+
+        npc_rect = pygame.Rect(
+            npc["x"] + NPC_OFFSET_X,
+            npc["y"] + NPC_OFFSET_Y,
+            40,
+            40
+        )
+
+        distance_x = abs(
+            player_rect.centerx - npc_rect.centerx
+        )
+
+        distance_y = abs(
+            player_rect.centery - npc_rect.centery
+        )
+
+        if (
+            distance_x < INTERACTION_DISTANCE
+            and distance_y < INTERACTION_DISTANCE
+        ):
+            nearby_npc = npc
+            break
+
 
    
     # KEEP PLAYER ON MAP
@@ -490,6 +518,44 @@ while running:
             (
                 npc["x"] + NPC_OFFSET_X - camera_x,
                 npc["y"] + NPC_OFFSET_Y - camera_y
+            )
+        )
+
+        # INTERACTION PROMPT
+
+    if nearby_npc is not None and not show_dialogue:
+
+        prompt_surface = small_font.render(
+            "Press E to interact",
+            True,
+            (255, 255, 255)
+        )
+
+        prompt_box = pygame.Rect(
+            WIDTH // 2 - 110,
+            HEIGHT - 80,
+            220,
+            45
+        )
+
+        pygame.draw.rect(
+            screen,
+            (20, 20, 20),
+            prompt_box
+        )
+
+        pygame.draw.rect(
+            screen,
+            (255, 255, 255),
+            prompt_box,
+            2
+        )
+
+        screen.blit(
+            prompt_surface,
+            (
+                prompt_box.centerx - prompt_surface.get_width() // 2,
+                prompt_box.centery - prompt_surface.get_height() // 2
             )
         )
 
