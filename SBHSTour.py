@@ -247,14 +247,25 @@ for layer in science_level["layerInstances"]:
             if entity["__identifier"] == "Sprites":
 
                 npc_id = None
+                npc_name = None
+                npc_dialogue = None
 
                 for field in entity["fieldInstances"]:
+
                     if field["__identifier"] == "NPCid":
                         npc_id = field["__value"]
+
+                    elif field["__identifier"] == "Sprite_name":
+                        npc_name = field["__value"]
+
+                    elif field["__identifier"] == "Dialogue":
+                        npc_dialogue = field["__value"]
 
                 if npc_id is not None:
                     npcs.append({
                         "id": npc_id,
+                        "name": npc_name,
+                        "dialogue": npc_dialogue,
                         "x": entity["px"][0],
                         "y": entity["px"][1]
                     })
@@ -267,6 +278,15 @@ for layer in science_level["layerInstances"]:
 camera_x = 0
 camera_y = 0
 
+# INTERACTION
+
+font = pygame.font.Font(None, 32)
+
+show_dialogue = False
+dialogue_text = ""
+dialogue_name = ""
+
+INTERACTION_DISTANCE = 500
 
 
 # MAIN LOOP
@@ -289,6 +309,37 @@ while running:
 
             if event.key == pygame.K_ESCAPE:
                 running = False
+
+            if event.key == pygame.K_e:
+
+                show_dialogue = False
+
+                for npc in npcs:
+
+                    npc_rect = pygame.Rect(
+                        npc["x"] + NPC_OFFSET_X,
+                        npc["y"] + NPC_OFFSET_Y,
+                        40,
+                        40
+                    )
+
+                    distance_x = abs(
+                        player_rect.centerx - npc_rect.centerx
+                    )
+
+                    distance_y = abs(
+                        player_rect.centery - npc_rect.centery
+                    )
+
+                    if (
+                        distance_x < INTERACTION_DISTANCE
+                        and distance_y < INTERACTION_DISTANCE
+                    ):
+
+                        dialogue_name = npc["name"]
+                        dialogue_text = npc["dialogue"]
+                        show_dialogue = True
+                        break
 
 
    
@@ -414,6 +465,52 @@ while running:
                 npc["x"] + NPC_OFFSET_X - camera_x,
                 npc["y"] + NPC_OFFSET_Y - camera_y
             )
+        )
+
+            # DRAW DIALOGUE
+
+    if show_dialogue:
+
+        box = pygame.Rect(
+            150,
+            HEIGHT - 180,
+            WIDTH - 300,
+            120
+        )
+
+        pygame.draw.rect(
+            screen,
+            (20, 20, 20),
+            box
+        )
+
+        pygame.draw.rect(
+            screen,
+            (255, 255, 255),
+            box,
+            3
+        )
+
+        name_surface = font.render(
+            dialogue_name,
+            True,
+            (255, 255, 255)
+        )
+
+        text_surface = font.render(
+            dialogue_text,
+            True,
+            (255, 255, 255)
+        )
+
+        screen.blit(
+            name_surface,
+            (box.x + 20, box.y + 20)
+        )
+
+        screen.blit(
+            text_surface,
+            (box.x + 20, box.y + 60)
         )
 
 
