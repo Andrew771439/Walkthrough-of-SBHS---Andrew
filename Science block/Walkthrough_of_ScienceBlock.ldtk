@@ -1308,7 +1308,7 @@
 							"width": 40,
 							"height": 40,
 							"defUid": 22,
-							"px": [176,176],
+							"px": [100,150],
 							"fieldInstances": [
 								{ "__identifier": "NPCid", "__type": "String", "__value": "Biology_teacher", "__tile": null, "defUid": 23, "realEditorValues": [{
 									"id": "V_String",
@@ -1337,7 +1337,7 @@
 							"width": 40,
 							"height": 40,
 							"defUid": 22,
-							"px": [256,720],
+							"px": [192,700],
 							"fieldInstances": [
 								{ "__identifier": "NPCid", "__type": "String", "__value": "Chemistry_teacher", "__tile": null, "defUid": 23, "realEditorValues": [{
 									"id": "V_String",
@@ -1366,7 +1366,7 @@
 							"width": 40,
 							"height": 40,
 							"defUid": 22,
-							"px": [992,176],
+							"px": [915,150],
 							"fieldInstances": [
 								{ "__identifier": "NPCid", "__type": "String", "__value": "Physics_teacher", "__tile": null, "defUid": 23, "realEditorValues": [{
 									"id": "V_String",
@@ -1395,7 +1395,7 @@
 							"width": 40,
 							"height": 40,
 							"defUid": 22,
-							"px": [768,656],
+							"px": [704,620],
 							"fieldInstances": [
 								{ "__identifier": "NPCid", "__type": "String", "__value": "Student", "__tile": null, "defUid": 23, "realEditorValues": [{
 									"id": "V_String",
