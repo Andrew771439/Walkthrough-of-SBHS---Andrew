@@ -97,6 +97,8 @@ if science_level is None:
 
 # LOAD IMAGES
 
+NPC_OFFSET_X = 0
+NPC_OFFSET_Y = 0
 
 map_image = pygame.image.load(
     map_image_path
@@ -387,8 +389,6 @@ while running:
         )
     )
 
-    # DRAW NPCS
-
         # DRAW NPCS
 
     for npc in npcs:
@@ -411,11 +411,10 @@ while running:
         screen.blit(
             image,
             (
-                npc["x"] - camera_x,
-                npc["y"] - camera_y
+                npc["x"] + NPC_OFFSET_X - camera_x,
+                npc["y"] + NPC_OFFSET_Y - camera_y
             )
         )
-
 
 
     
