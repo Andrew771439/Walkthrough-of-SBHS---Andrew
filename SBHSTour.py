@@ -5,6 +5,34 @@ import os
 pygame.init()
 
 
+class pos:
+    """Small reusable 2-D position value used by the tour."""
+
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+
+    def __iter__(self):
+        return iter((self.x, self.y))
+
+    def __repr__(self):
+        return f"pos({self.x}, {self.y})"
+
+    def copy(self):
+        return pos(self.x, self.y)
+
+    def as_tuple(self):
+        return self.x, self.y
+
+    def distance_to(self, other):
+        return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
+
+    def __eq__(self, other):
+        if not isinstance(other, pos):
+            return NotImplemented
+        return self.x == other.x and self.y == other.y
+
+
 # --------------------------------------------------
 # WINDOW
 # --------------------------------------------------
@@ -551,6 +579,60 @@ physics_close_button = pygame.Rect(
     35
 )
 
+# --------------------------------------------------
+# BIOLOGY TREE MINIGAME
+# --------------------------------------------------
+
+show_biology_minigame = False
+
+biology_stage = 0
+biology_dragging = None
+
+biology_sequence = [
+    "Water",
+    "Sunlight",
+    "Air"
+]
+
+biology_message = "Drag WATER to the tree!"
+
+tree_drop_rect = pygame.Rect(
+    WIDTH // 2 - 100,
+    250,
+    200,
+    330
+)
+
+biology_items = [
+    {
+        "name": "Water",
+        "rect": pygame.Rect(250, 300, 160, 60),
+        "start_x": 250,
+        "start_y": 300
+    },
+    {
+        "name": "Sunlight",
+        "rect": pygame.Rect(250, 400, 160, 60),
+        "start_x": 250,
+        "start_y": 400
+    },
+    {
+        "name": "Air",
+        "rect": pygame.Rect(250, 500, 160, 60),
+        "start_x": 250,
+        "start_y": 500
+    }
+]
+
+biology_used_items = []
+
+biology_minigame_close = pygame.Rect(
+    WIDTH - 250,
+    170,
+    90,
+    40
+)
+
 
 # --------------------------------------------------
 # MAIN LOOP
@@ -644,22 +726,35 @@ while running:
                         distance_y < INTERACTION_DISTANCE
                     ):
 
+                        interaction_found = True
 
                         if interactable["id"] == "biology_question":
-                            show_dialogue = False
-                            show_physics_question = False
                             show_biology_question = True
+                            show_physics_question = False
+                            show_biology_minigame = False
                             biology_result = ""
-                            interaction_found = True
-                            break
 
                         elif interactable["id"] == "physics_question":
-                            show_dialogue = False
-                            show_biology_question = False
                             show_physics_question = True
+                            show_biology_question = False
+                            show_physics_minigame = False
                             physics_result = ""
-                            interaction_found = True
-                            break
+
+                        elif interactable["id"] == "biology_experiment":
+                            show_biology_question = False
+                            show_physics_question = False
+                            show_biology_minigame = True
+
+                            biology_stage = 0
+                            biology_used_items = []
+                            biology_dragging = None
+                            biology_message = "Drag WATER to the tree!"
+
+                            for item in biology_items:
+                                item["rect"].x = item["start_x"]
+                                item["rect"].y = item["start_y"]
+
+                        break
 
 
                 # --------------------------------------
@@ -722,13 +817,71 @@ while running:
 
 
         # ----------------------------------------------
-        # MOUSE CLICK
+        # MOUSE movement and clicks
         # ----------------------------------------------
+
+        if event.type == pygame.MOUSEMOTION:
+
+            if (
+                show_biology_minigame
+                and biology_dragging is not None
+            ):
+
+                biology_items[biology_dragging]["rect"].center = event.pos
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            if (
+                event.button == 1
+                and show_biology_minigame
+                and biology_dragging is not None
+            ):
+                item = biology_items[biology_dragging]
+
+                if item["rect"].colliderect(tree_drop_rect):
+                    correct_item = biology_sequence[biology_stage]
+
+                    if item["name"] == correct_item:
+                        biology_used_items.append(item["name"])
+                        biology_stage += 1
+
+                        if biology_stage == 1:
+                            biology_message = "Great! Now drag SUNLIGHT!"
+                        elif biology_stage == 2:
+                            biology_message = "Great! Now drag AIR!"
+                        elif biology_stage == 3:
+                            biology_message = "You grew the tree!"
+                    else:
+                        biology_message = "Try another one!"
+
+                item["rect"].x = item["start_x"]
+                item["rect"].y = item["start_y"]
+                biology_dragging = None
 
         if event.type == pygame.MOUSEBUTTONDOWN:
 
-
             if event.button == 1:
+
+                # BIOLOGY MINIGAME CLOSE
+
+                if (
+                    show_biology_minigame
+                    and biology_minigame_close.collidepoint(event.pos)
+                ):
+                    show_biology_minigame = False
+
+
+                # PICK UP BIOLOGY ITEM
+
+                if show_biology_minigame:
+
+                    for i, item in enumerate(biology_items):
+
+                        if (
+                            item["name"] not in biology_used_items
+                            and item["rect"].collidepoint(event.pos)
+                        ):
+                            biology_dragging = i
+                            break
 
 
                 # --------------------------------------
@@ -1609,6 +1762,236 @@ while running:
                 - close_question_text.get_height() // 2
             )
         )
+
+
+
+    # --------------------------------------------------
+    # DRAW BIOLOGY TREE MINIGAME
+    # ------------------------------------------------
+
+
+
+
+    if show_biology_minigame:
+
+        minigame_box = pygame.Rect(
+            120,
+            130,
+            WIDTH - 240,
+            HEIGHT - 220
+        )
+
+        pygame.draw.rect(
+            screen,
+            (235, 245, 225),
+            minigame_box
+        )
+
+        pygame.draw.rect(
+            screen,
+            (30, 30, 30),
+            minigame_box,
+            4
+        )
+
+        title_surface = font.render(
+            "Help the Tree Grow!",
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            title_surface,
+            (
+                minigame_box.x + 30,
+                minigame_box.y + 25
+            )
+        )
+
+        message_surface = small_font.render(
+            biology_message,
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            message_surface,
+            (
+                minigame_box.x + 30,
+                minigame_box.y + 70
+           )
+        )
+
+
+        # TREE AREA
+
+        pygame.draw.rect(
+            screen,
+            (210, 230, 200),
+            tree_drop_rect,
+            2
+        )
+
+
+        # SEED
+
+        if biology_stage == 0:
+
+            pygame.draw.circle(
+                screen,
+                (100, 70, 40),
+                tree_drop_rect.center,
+                15
+            )
+
+
+        # SMALL SPROUT
+
+        elif biology_stage == 1:
+
+            pygame.draw.rect(
+                screen,
+                (100, 70, 40),
+                (
+                    tree_drop_rect.centerx - 5,
+                    tree_drop_rect.centery,
+                    10,
+                    80
+                )
+            )
+
+            pygame.draw.circle(
+                screen,
+                (80, 160, 70),
+                (
+                    tree_drop_rect.centerx,
+                    tree_drop_rect.centery
+                ),
+                35
+            )
+
+
+        # SMALL TREE
+
+        elif biology_stage == 2:
+
+            pygame.draw.rect(
+                screen,
+                (100, 70, 40),
+                (
+                    tree_drop_rect.centerx - 10,
+                    tree_drop_rect.centery - 20,
+                    20,
+                    140
+                )
+            )
+
+            pygame.draw.circle(
+                screen,
+                (70, 150, 60),
+                (
+                    tree_drop_rect.centerx,
+                    tree_drop_rect.centery - 40
+                ),
+                65
+            )
+
+
+        # FULL TREE
+
+        elif biology_stage >= 3:
+
+            pygame.draw.rect(
+                screen,
+                (100, 70, 40),
+                (
+                    tree_drop_rect.centerx - 15,
+                    tree_drop_rect.centery - 30,
+                    30,
+                    180
+                )
+            )
+
+            pygame.draw.circle(
+                screen,
+                (60, 150, 60),
+                (
+                    tree_drop_rect.centerx,
+                    tree_drop_rect.centery - 70
+                ),
+                90
+            )
+
+
+        # DRAGGABLE ITEMS
+
+        for item in biology_items:
+
+            if item["name"] not in biology_used_items:
+
+                pygame.draw.rect(
+                    screen,
+                    (255, 255, 255),
+                    item["rect"]
+                )
+
+                pygame.draw.rect(
+                    screen,
+                    (30, 30, 30),
+                    item["rect"],
+                    2
+                )
+
+                item_text = small_font.render(
+                    item["name"],
+                    True,
+                    (20, 20, 20)
+                )
+
+                screen.blit(
+                    item_text,
+                    (
+                        item["rect"].centerx
+                        - item_text.get_width() // 2,
+
+                        item["rect"].centery
+                        - item_text.get_height() // 2
+                    )
+                )
+
+
+        # CLOSE BUTTON
+
+        pygame.draw.rect(
+            screen,
+            (210, 210, 200),
+            biology_minigame_close
+        )
+
+        pygame.draw.rect(
+            screen,
+            (20, 20, 20),
+            biology_minigame_close,
+            2
+        )
+
+        close_text = small_font.render(
+            "Close",
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            close_text,
+            (
+                biology_minigame_close.centerx
+                - close_text.get_width() // 2,
+
+                biology_minigame_close.centery
+                - close_text.get_height() // 2
+            )
+        )
+
 
 
     # --------------------------------------------------
