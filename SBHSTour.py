@@ -633,6 +633,64 @@ biology_minigame_close = pygame.Rect(
     40
 )
 
+# --------------------------------------------------
+# CHEMISTRY COLOUR MIXING MINIGAME
+# --------------------------------------------------
+
+show_chemistry_minigame = False
+
+chemistry_dragging = None
+chemistry_selected = []
+
+chemistry_targets = [
+    "Green",
+    "Purple",
+    "Orange"
+]
+
+chemistry_round = 0
+chemistry_message = "Make GREEN"
+
+chemistry_colours = [
+    {
+        "name": "Red",
+        "colour": (220, 60, 60),
+        "rect": pygame.Rect(220, 320, 150, 60),
+        "start_x": 220,
+        "start_y": 320
+    },
+    {
+        "name": "Blue",
+        "colour": (70, 110, 220),
+        "rect": pygame.Rect(220, 420, 150, 60),
+        "start_x": 220,
+        "start_y": 420
+    },
+    {
+        "name": "Yellow",
+        "colour": (240, 220, 60),
+        "rect": pygame.Rect(220, 520, 150, 60),
+        "start_x": 220,
+        "start_y": 520
+    }
+]
+
+chemistry_beaker_rect = pygame.Rect(
+    WIDTH // 2 - 100,
+    300,
+    200,
+    250
+)
+
+chemistry_close_button = pygame.Rect(
+    WIDTH - 250,
+    170,
+    90,
+    40
+)
+
+chemistry_mix_colour = (240, 240, 240)
+
 
 # --------------------------------------------------
 # MAIN LOOP
@@ -653,6 +711,7 @@ while running:
 
         if event.type == pygame.QUIT:
             running = False
+
 
         # ----------------------------------------------
         # KEYBOARD
@@ -754,6 +813,23 @@ while running:
                                 item["rect"].x = item["start_x"]
                                 item["rect"].y = item["start_y"]
 
+                        elif interactable["id"] == "chemistry_experiment":
+
+                            show_biology_question = False
+                            show_physics_question = False
+                            show_biology_minigame = False
+                            show_chemistry_minigame = True
+
+                            chemistry_round = 0
+                            chemistry_selected = []
+                            chemistry_dragging = None
+                            chemistry_message = "Make GREEN"
+                            chemistry_mix_colour = (240, 240, 240)
+
+                            for item in chemistry_colours:
+                                item["rect"].x = item["start_x"]
+                                item["rect"].y = item["start_y"]
+
                         break
 
 
@@ -829,6 +905,13 @@ while running:
 
                 biology_items[biology_dragging]["rect"].center = event.pos
 
+            if (
+                show_chemistry_minigame
+                and chemistry_dragging is not None
+            ):
+
+                chemistry_colours[chemistry_dragging]["rect"].center = event.pos
+
         if event.type == pygame.MOUSEBUTTONUP:
             if (
                 event.button == 1
@@ -857,6 +940,75 @@ while running:
                 item["rect"].y = item["start_y"]
                 biology_dragging = None
 
+            if (
+                event.button == 1
+                and show_chemistry_minigame
+                and chemistry_dragging is not None
+            ):
+
+                item = chemistry_colours[chemistry_dragging]
+
+                if item["rect"].colliderect(chemistry_beaker_rect):
+
+                    if item["name"] not in chemistry_selected:
+                        chemistry_selected.append(item["name"])
+
+                    # SHOW FIRST COLOUR IN THE BEAKER
+
+                    if len(chemistry_selected) == 1:
+                        chemistry_mix_colour = item["colour"]
+
+                    if len(chemistry_selected) == 2:
+
+                        mix = set(chemistry_selected)
+                        result_name = ""
+
+                        if mix == {"Blue", "Yellow"}:
+                            result_name = "Green"
+                            chemistry_mix_colour = (80, 180, 80)
+
+                        elif mix == {"Red", "Blue"}:
+                            result_name = "Purple"
+                            chemistry_mix_colour = (150, 80, 180)
+
+                        elif mix == {"Red", "Yellow"}:
+                            result_name = "Orange"
+                            chemistry_mix_colour = (240, 150, 50)
+
+                        target = chemistry_targets[chemistry_round]
+
+                        if result_name == target:
+
+                            chemistry_selected = []
+                            chemistry_round += 1
+
+                            if chemistry_round < len(chemistry_targets):
+                                next_target = chemistry_targets[chemistry_round]
+
+                                chemistry_message = (
+                                    "Correct! Now make "
+                                    + next_target.upper()
+                                )
+
+                            else:
+                                chemistry_message = "Experiment complete!"
+
+                        else:
+
+                            chemistry_message = (
+                                "Wrong mix! Try "
+                                + target.upper()
+                                + " again."
+                            )
+
+                            chemistry_selected = []
+                            chemistry_mix_colour = (240, 240, 240)
+
+                item["rect"].x = item["start_x"]
+                item["rect"].y = item["start_y"]
+
+                chemistry_dragging = None
+
         if event.type == pygame.MOUSEBUTTONDOWN:
 
             if event.button == 1:
@@ -882,6 +1034,30 @@ while running:
                         ):
                             biology_dragging = i
                             break
+
+                # CHEMISTRY MINIGAME CLOSE
+
+                if (
+                    show_chemistry_minigame
+                    and chemistry_close_button.collidepoint(event.pos)
+                ):
+                    show_chemistry_minigame = False
+
+
+                # PICK UP CHEMISTRY COLOUR
+
+                if (
+                    show_chemistry_minigame
+                    and chemistry_round < len(chemistry_targets)
+                ):
+
+                    for i, item in enumerate(chemistry_colours):
+
+                        if item["rect"].collidepoint(event.pos):
+
+                            chemistry_dragging = i
+                            break
+        
 
 
                 # --------------------------------------
@@ -1991,6 +2167,169 @@ while running:
                 - close_text.get_height() // 2
             )
         )
+
+
+    # --------------------------------------------------
+    # DRAW CHEMISTRY COLOUR MIXING MINIGAME
+    # --------------------------------------------------
+
+    if show_chemistry_minigame:
+
+        chemistry_box = pygame.Rect(
+            120,
+            130,
+            WIDTH - 240,
+            HEIGHT - 220
+        )
+
+        pygame.draw.rect(
+            screen,
+            (245, 245, 235),
+            chemistry_box
+        )
+
+        pygame.draw.rect(
+            screen,
+            (30, 30, 30),
+            chemistry_box,
+            4
+        )
+
+
+        # TITLE
+
+        title_surface = font.render(
+            "Chemistry Colour Mixing",
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            title_surface,
+            (
+                chemistry_box.x + 30,
+                chemistry_box.y + 25
+            )
+        )
+
+
+        # TARGET MESSAGE
+
+        message_surface = small_font.render(
+            chemistry_message,
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            message_surface,
+            (
+                chemistry_box.x + 30,
+                chemistry_box.y + 70
+            )
+        )
+
+
+        # BEAKER
+
+        pygame.draw.rect(
+            screen,
+            chemistry_mix_colour,
+            chemistry_beaker_rect
+        )
+
+        pygame.draw.rect(
+            screen,
+            (30, 30, 30),
+            chemistry_beaker_rect,
+            4
+        )
+
+        beaker_text = small_font.render(
+            "BEAKER",
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            beaker_text,
+            (
+                chemistry_beaker_rect.centerx
+                - beaker_text.get_width() // 2,
+
+                chemistry_beaker_rect.centery
+                - beaker_text.get_height() // 2
+            )
+        )
+
+
+        # COLOUR BLOCKS
+
+        for item in chemistry_colours:
+
+            pygame.draw.rect(
+                screen,
+                item["colour"],
+                item["rect"]
+            )
+
+            pygame.draw.rect(
+                screen,
+                (30, 30, 30),
+                item["rect"],
+                2
+            )
+
+            colour_text = small_font.render(
+                item["name"],
+                True,
+                (20, 20, 20)
+            )
+
+            screen.blit(
+                colour_text,
+                (
+                    item["rect"].centerx
+                    - colour_text.get_width() // 2,
+
+                    item["rect"].centery
+                    - colour_text.get_height() // 2
+                )
+            )
+
+
+        # CLOSE BUTTON
+
+        pygame.draw.rect(
+            screen,
+            (210, 210, 200),
+            chemistry_close_button
+        )
+
+        pygame.draw.rect(
+            screen,
+            (20, 20, 20),
+            chemistry_close_button,
+            2
+        )
+
+        close_text = small_font.render(
+            "Close",
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            close_text,
+            (
+                chemistry_close_button.centerx
+                - close_text.get_width() // 2,
+
+                chemistry_close_button.centery
+                - close_text.get_height() // 2
+            )
+        )
+
 
 
 
