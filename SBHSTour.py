@@ -416,7 +416,7 @@ small_font = pygame.font.Font(
 )
 
 
-INTERACTION_DISTANCE = 60
+INTERACTION_DISTANCE = 40
 
 
 # --------------------------------------------------
@@ -472,6 +472,23 @@ biology_answers = [
 
 ]
 
+#--------------------------------------------------
+# PHYSICS QUESTION
+#--------------------------------------------------
+show_physics_question = False
+physics_result = ""
+
+physics_question = "What is the unit of force?"
+
+physics_answers = [
+    "A. Joule",
+    "B. Newton",
+    "C. Watt",
+    "D. Volt"
+]
+
+correct_physics_answer = 1
+
 
 correct_biology_answer = 1
 
@@ -497,6 +514,19 @@ for i in range(4):
         button
     )
 
+physics_buttons = []
+
+for i in range(4):
+
+    button = pygame.Rect(
+        WIDTH // 2 - 250,
+        350 + i * 65,
+        500,
+        50
+    )
+
+    physics_buttons.append(button)
+
 
 biology_close_button = pygame.Rect(
 
@@ -508,6 +538,17 @@ biology_close_button = pygame.Rect(
 
     35
 
+)
+
+physics_close_button = pygame.Rect(
+
+    WIDTH // 2 + 210,
+
+    200,
+
+    70,
+
+    35
 )
 
 
@@ -529,31 +570,25 @@ while running:
 
 
         if event.type == pygame.QUIT:
-
             running = False
-
 
         # ----------------------------------------------
         # KEYBOARD
         # ----------------------------------------------
 
         if event.type == pygame.KEYDOWN:
-
-
             if event.key == pygame.K_ESCAPE:
-
                 if show_biology_question:
-
                     show_biology_question = False
 
-                elif show_dialogue:
+                elif show_physics_question:
+                    show_physics_question = False
 
+                elif show_dialogue:
                     show_dialogue = False
 
                 else:
-
                     running = False
-
 
             # ------------------------------------------
             # PRESS E
@@ -611,15 +646,19 @@ while running:
 
 
                         if interactable["id"] == "biology_question":
-
                             show_dialogue = False
-
+                            show_physics_question = False
                             show_biology_question = True
-
                             biology_result = ""
-
                             interaction_found = True
+                            break
 
+                        elif interactable["id"] == "physics_question":
+                            show_dialogue = False
+                            show_biology_question = False
+                            show_physics_question = True
+                            physics_result = ""
+                            interaction_found = True
                             break
 
 
@@ -708,7 +747,7 @@ while running:
 
 
                 # --------------------------------------
-                # BIOLOGY QUESTION CLOSE BUTTON
+                # BIOLOGY AND PHYSICS QUESTION CLOSE BUTTON
                 # --------------------------------------
 
                 if (
@@ -720,6 +759,17 @@ while running:
                 ):
 
                     show_biology_question = False
+                    show_physics_question = False
+
+                if (
+                    show_physics_question
+                    and
+                    physics_close_button.collidepoint(
+                        event.pos
+                    )
+                ):
+
+                    show_physics_question = False
 
 
                 # --------------------------------------
@@ -747,6 +797,28 @@ while running:
                             else:
 
                                 biology_result = "Try again!"
+
+
+                # PHYSICS ANSWERS
+                # --------------------------------------
+
+                if show_physics_question:
+
+                    for i, button in enumerate(
+                        physics_buttons
+                    ):
+
+                        if button.collidepoint(
+                            event.pos
+                        ):
+
+                            if i == correct_physics_answer:
+
+                                physics_result = "Correct!"
+
+                            else:
+
+                                physics_result = "Try again!"
 
 
     # --------------------------------------------------
@@ -1074,6 +1146,8 @@ while running:
         not show_dialogue
         and
         not show_biology_question
+        and
+        not show_physics_question
     ):
 
 
@@ -1229,6 +1303,8 @@ while running:
             )
 
         )
+
+    
 
 
         # QUESTION
@@ -1400,6 +1476,138 @@ while running:
 
             )
 
+        )
+
+
+    # --------------------------------------------------
+    # DRAW PHYSICS QUESTION
+    # --------------------------------------------------
+
+    if show_physics_question:
+
+        question_box = pygame.Rect(
+            WIDTH // 2 - 300,
+            180,
+            600,
+            470
+        )
+
+        pygame.draw.rect(
+            screen,
+            (245, 245, 235),
+            question_box
+        )
+
+        pygame.draw.rect(
+            screen,
+            (30, 30, 30),
+            question_box,
+            4
+        )
+
+        title_surface = font.render(
+            "Physics Question",
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            title_surface,
+            (
+                question_box.x + 20,
+                question_box.y + 20
+            )
+        )
+
+        question_surface = small_font.render(
+            physics_question,
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            question_surface,
+            (
+                question_box.x + 20,
+                question_box.y + 75
+            )
+        )
+
+        for i, button in enumerate(physics_buttons):
+
+            pygame.draw.rect(
+                screen,
+                (220, 220, 210),
+                button
+            )
+
+            pygame.draw.rect(
+                screen,
+                (30, 30, 30),
+                button,
+                2
+            )
+
+            answer_surface = small_font.render(
+                physics_answers[i],
+                True,
+                (20, 20, 20)
+            )
+
+            screen.blit(
+                answer_surface,
+                (
+                    button.x + 15,
+                    button.y + 13
+                )
+            )
+
+        if physics_result != "":
+
+            result_surface = font.render(
+                physics_result,
+                True,
+                (20, 20, 20)
+            )
+
+            screen.blit(
+                result_surface,
+                (
+                    question_box.x + 20,
+                    question_box.bottom - 55
+                )
+            )
+
+        # CLOSE BUTTON
+
+        pygame.draw.rect(
+            screen,
+            (210, 210, 200),
+            physics_close_button
+        )
+
+        pygame.draw.rect(
+            screen,
+            (20, 20, 20),
+            physics_close_button,
+            2
+        )
+
+        close_question_text = small_font.render(
+            "Close",
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            close_question_text,
+            (
+                physics_close_button.centerx
+                - close_question_text.get_width() // 2,
+
+                physics_close_button.centery
+                - close_question_text.get_height() // 2
+            )
         )
 
 
