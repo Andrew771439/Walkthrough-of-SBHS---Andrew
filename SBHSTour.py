@@ -100,6 +100,38 @@ student_image_path = os.path.join(
     "Science_Student.png"
 )
 
+player_front_path = os.path.join(
+    BASE_DIR,
+    "Science block",
+    "Assets",
+    "Front_facing",
+    "spritesheet.png"
+)
+
+player_back_path = os.path.join(
+    BASE_DIR,
+    "Science block",
+    "Assets",
+    "Back_facing",
+    "spritesheet.png"
+)
+
+player_left_path = os.path.join(
+    BASE_DIR,
+    "Science block",
+    "Assets",
+    "Left_facing",
+    "spritesheet.png"
+)
+
+player_right_path = os.path.join(
+    BASE_DIR,
+    "Science block",
+    "Assets",
+    "Right_facing",
+    "spritesheet.png"
+)
+
 
 # --------------------------------------------------
 # LOAD LDTK
@@ -193,6 +225,78 @@ student_image = pygame.transform.scale(
     (40, 40)
 )
 
+player_front_sheet = pygame.image.load(
+    player_front_path
+).convert_alpha()
+
+player_back_sheet = pygame.image.load(
+    player_back_path
+).convert_alpha()
+
+player_left_sheet = pygame.image.load(
+    player_left_path
+).convert_alpha()
+
+player_right_sheet = pygame.image.load(
+    player_right_path
+).convert_alpha()
+
+def split_spritesheet(sheet, frame_width, frame_height, frame_count):
+
+    frames = []
+
+    for i in range(frame_count):
+
+        frame = sheet.subsurface(
+            pygame.Rect(
+                i * frame_width,
+                0,
+                frame_width,
+                frame_height
+            )
+        )
+
+        scale = 40 / frame_height
+
+        new_width = int(frame_width * scale)
+        new_height = 40
+
+        frame = pygame.transform.scale(
+            frame,
+            (new_width, new_height)
+        )
+
+        frames.append(frame)
+
+    return frames
+
+player_front_frames = split_spritesheet(
+    player_front_sheet,
+    32,
+    32,
+    8
+)
+
+player_back_frames = split_spritesheet(
+    player_back_sheet,
+    16,
+    30,
+    8
+)
+
+player_left_frames = split_spritesheet(
+    player_left_sheet,
+    15,
+    30,
+    8
+)
+
+player_right_frames = split_spritesheet(
+    player_right_sheet,
+    15,
+    30,
+    8
+)
 
 # --------------------------------------------------
 # LOAD COLLISIONS
@@ -309,7 +413,12 @@ finish_tour_button = pygame.Rect(
 # PLAYER
 # --------------------------------------------------
 
-PLAYER_SPEED = 4
+PLAYER_SPEED = 3
+
+player_direction = "front"
+player_frame = 0
+player_animation_timer = 0
+player_animation_speed = 8
 
 player_rect = pygame.Rect(
     player_x,
@@ -477,6 +586,19 @@ font = pygame.font.Font(
 small_font = pygame.font.Font(
     None,
     26
+)
+
+# --------------------------------------------------
+# WELCOME SCREEN
+# --------------------------------------------------
+
+show_welcome = True
+
+start_tour_button = pygame.Rect(
+    WIDTH // 2 - 120,
+    HEIGHT // 2 + 220,
+    240,
+    60
 )
 
 
@@ -1189,6 +1311,12 @@ while running:
 
             if event.button == 1:
 
+                if (
+                    show_welcome
+                    and start_tour_button.collidepoint(event.pos)
+                ):
+                    show_welcome = False
+
                 # TELEPORT YES / NO BUTTONS
 
                 if show_teleport_prompt:
@@ -1403,24 +1531,35 @@ while running:
 
 
     if keys[pygame.K_w]:
-
         move_y -= PLAYER_SPEED
-
+        player_direction = "back"
 
     if keys[pygame.K_s]:
-
         move_y += PLAYER_SPEED
-
+        player_direction = "front"
 
     if keys[pygame.K_a]:
-
         move_x -= PLAYER_SPEED
-
+        player_direction = "left"
 
     if keys[pygame.K_d]:
-
         move_x += PLAYER_SPEED
+        player_direction = "right"
 
+    if move_x != 0 or move_y != 0:
+
+        player_animation_timer += 1
+
+        if player_animation_timer >= player_animation_speed:
+            player_frame += 1
+            player_animation_timer = 0
+
+            if player_frame >= 8:
+                player_frame = 0
+
+    else:
+        player_frame = 0
+        player_animation_timer = 0
 
     move_player_x(
         move_x
@@ -1655,16 +1794,30 @@ while running:
     # DRAW PLAYER
     # --------------------------------------------------
 
+    if player_direction == "front":
+        current_player_image = player_front_frames[player_frame]
+
+    elif player_direction == "back":
+        current_player_image = player_back_frames[player_frame]
+
+    elif player_direction == "left":
+        current_player_image = player_left_frames[player_frame]
+
+    elif player_direction == "right":
+        current_player_image = player_right_frames[player_frame]
+
     screen.blit(
+    current_player_image,
+    (
+        player_rect.centerx
+        - current_player_image.get_width() // 2
+        - camera_x,
 
-        player_image,
-
-        (
-            player_rect.x - camera_x,
-            player_rect.y - camera_y
-        )
-
+        player_rect.bottom
+        - current_player_image.get_height()
+        - camera_y
     )
+)
 
 
     # --------------------------------------------------
@@ -1722,26 +1875,43 @@ while running:
             or
             nearby_interactable is not None
         )
-        and
-        not show_dialogue
-        and
-        not show_biology_question
-        and
-        not show_physics_question
+        and not show_dialogue
+        and not show_biology_question
+        and not show_physics_question
+        and not show_biology_minigame
+        and not show_chemistry_minigame
+        and not show_physics_minigame
+        and not show_toilet_minigame
+        and not show_teleport_prompt
+        and not show_next_area
+        and not show_welcome
     ):
 
+        if nearby_interactable is not None:
 
-        if (
-            nearby_interactable is not None
-            and
-            nearby_interactable["id"] == "biology_question"
-        ):
+            if nearby_interactable["id"] == "biology_question":
+                prompt_text = " E to answer Biology question"
 
-            prompt_text = "Press E to answer question"
+            elif nearby_interactable["id"] == "physics_question":
+                prompt_text = " E to answer Physics question"
 
-        else:
+            elif nearby_interactable["id"] == "biology_experiment":
+                prompt_text = " E to start Biology experiment"
 
-            prompt_text = "Press E to interact"
+            elif nearby_interactable["id"] == "chemistry_experiment":
+                prompt_text = " E to start Chemistry experiment"
+
+            elif nearby_interactable["id"] == "Physics_experiment":
+                prompt_text = " E to start Physics experiment"
+
+            elif nearby_interactable["id"] == "Golden_pencil":
+                prompt_text = " E to search the toilets"
+
+            else:
+                prompt_text = "Press E to interact"
+
+        elif nearby_npc is not None:
+            prompt_text = "Press E to talk"
 
 
         prompt_surface = small_font.render(
@@ -3272,6 +3442,98 @@ while running:
             (
                 finish_tour_button.centerx - finish_text.get_width() // 2,
                 finish_tour_button.centery - finish_text.get_height() // 2
+            )
+        )
+
+
+    # --------------------------------------------------
+    # DRAW WELCOME SCREEN
+    # --------------------------------------------------
+
+    if show_welcome:
+
+        screen.fill((35, 45, 40))
+
+        title = font.render(
+            "WELCOME TO THE SBHS SCIENCE BLOCK TOUR",
+            True,
+            (255, 255, 255)
+        )
+
+        screen.blit(
+            title,
+            (
+                WIDTH // 2 - title.get_width() // 2,
+                120
+            )
+        )
+
+        how_to_play = font.render(
+            "How to Play",
+            True,
+            (255, 255, 255)
+        )
+
+        screen.blit(
+            how_to_play,
+            (
+                WIDTH // 2 - how_to_play.get_width() // 2,
+                200
+            )
+        )
+
+        instructions = [
+            "WASD - Move",
+            "E - Interact with teachers and objects",
+            "Mouse - Click buttons and minigame options",
+            "Walk away from an NPC to close their dialogue",
+            "",
+            "Explore the Science Block, complete the activities,",
+            "and make your way to the end of the tour."
+        ]
+
+        for i, line in enumerate(instructions):
+
+            instruction_text = small_font.render(
+                line,
+                True,
+                (230, 230, 230)
+            )
+
+            screen.blit(
+                instruction_text,
+                (
+                    WIDTH // 2 - instruction_text.get_width() // 2,
+                    270 + i * 45
+                )
+            )
+
+        pygame.draw.rect(
+            screen,
+            (220, 220, 200),
+            start_tour_button,
+            border_radius=10
+        )
+
+        pygame.draw.rect(
+            screen,
+            (40, 40, 40),
+            start_tour_button,
+            3,
+            border_radius=10
+        )
+
+        start_text = small_font.render(
+            "START TOUR",
+            True,
+            (30, 30, 30)
+        )
+
+        screen.blit(
+            start_text,
+            (
+                start_tour_button.centerx - start_text.get_width() // 2,
+                start_tour_button.centery - start_text.get_height() // 2
             )
         )
 

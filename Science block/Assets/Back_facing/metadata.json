@@ -1,0 +1,12 @@
+{
+  "type": "animation",
+  "prompt": "Back-facing walking cycle. Character stays facing away from the viewer in every frame. No turning, no rotation, no side views. Animate only the arms and legs walking.",
+  "width": 16,
+  "height": 30,
+  "frame_w": 16,
+  "frame_h": 30,
+  "frame_count": 8,
+  "fps": 8,
+  "preview": "preview.webp",
+  "spritesheet": "spritesheet.png"
+}

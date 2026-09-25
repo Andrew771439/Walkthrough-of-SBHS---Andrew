@@ -1,0 +1,12 @@
+{
+  "type": "animation",
+  "prompt": "Right-facing walking cycle. The character stays facing directly right in every frame. No turning, no rotation, no front or back views. Animate only the arms and legs walking. Keep the same hairstyle, clothing, colours, proportions, and pixel-art style. 3–4 frames. Transparent background.",
+  "width": 15,
+  "height": 30,
+  "frame_w": 15,
+  "frame_h": 30,
+  "frame_count": 8,
+  "fps": 8,
+  "preview": "preview.webp",
+  "spritesheet": "spritesheet.png"
+}

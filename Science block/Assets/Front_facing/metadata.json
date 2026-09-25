@@ -1,0 +1,12 @@
+{
+  "type": "animation",
+  "prompt": "“Animate this same neutral student character in a simple pixel-art style. Create a walking animation suitable for a school game sprite. Keep the same hair, clothes, colours, proportions, and overall look. Make the animation readable and friendly for all users. Show a smooth walk cycle with small arm and leg movement. Transparent background. 4 directions: down, up, left, right. 3–4 frames per direction. Keep the sprite centered and sized for a 32x32 or 40x40 game sprite sheet.”",
+  "width": 32,
+  "height": 32,
+  "frame_w": 32,
+  "frame_h": 32,
+  "frame_count": 8,
+  "fps": 8,
+  "preview": "preview.webp",
+  "spritesheet": "spritesheet.png"
+}
