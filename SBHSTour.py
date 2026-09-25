@@ -446,6 +446,9 @@ small_font = pygame.font.Font(
 
 INTERACTION_DISTANCE = 40
 
+INTERACTABLE_OFFSET_X = -50
+INTERACTABLE_OFFSET_Y = 0
+
 
 # --------------------------------------------------
 # NPC DIALOGUE
@@ -649,7 +652,7 @@ chemistry_targets = [
 ]
 
 chemistry_round = 0
-chemistry_message = "Make GREEN"
+chemistry_message = "Make GREEN (drag colours into the beaker!)"
 
 chemistry_colours = [
     {
@@ -735,6 +738,31 @@ physics_minigame_close = pygame.Rect(
     40
 )
 
+# --------------------------------------------------
+# TOILET SEARCH MINIGAME
+# --------------------------------------------------
+
+show_toilet_minigame = False
+
+toilet_result = ""
+golden_pencil_found = False
+
+toilet_buttons = [
+    pygame.Rect(WIDTH // 2 - 260, 350, 160, 180),
+    pygame.Rect(WIDTH // 2 - 80, 350, 160, 180),
+    pygame.Rect(WIDTH // 2 + 100, 350, 160, 180)
+]
+
+# Toilet number 2 contains the special item
+special_toilet = 1
+
+toilet_close_button = pygame.Rect(
+    WIDTH // 2 + 240,
+    200,
+    90,
+    40
+)
+
 
 # --------------------------------------------------
 # MAIN LOOP
@@ -794,14 +822,13 @@ while running:
 
                     interactable_rect = pygame.Rect(
 
-                        interactable["x"],
+                        interactable["x"] + INTERACTABLE_OFFSET_X,
 
-                        interactable["y"],
+                        interactable["y"] + INTERACTABLE_OFFSET_Y,
 
                         32,
 
                         32
-
                     )
 
 
@@ -867,7 +894,7 @@ while running:
                             chemistry_round = 0
                             chemistry_selected = []
                             chemistry_dragging = None
-                            chemistry_message = "Make GREEN"
+                            chemistry_message = "Make GREEN (drag colours into the beaker!)"
                             chemistry_mix_colour = (240, 240, 240)
 
                             for item in chemistry_colours:
@@ -892,6 +919,17 @@ while running:
 
                             physics_box_rect.x = WIDTH // 2 - 100
                             physics_box_rect.y = 300
+
+                        elif interactable["id"] == "Golden_pencil":
+
+                            show_biology_question = False
+                            show_physics_question = False
+                            show_biology_minigame = False
+                            show_chemistry_minigame = False
+                            show_physics_minigame = False
+
+                            show_toilet_minigame = True
+                            toilet_result = ""
 
                         break
 
@@ -946,7 +984,14 @@ while running:
 
                             dialogue_name = npc["name"]
 
-                            dialogue_text = npc["dialogue"]
+                            if (
+                                npc["id"] == "Student"
+                                and golden_pencil_found
+                            ):
+                                dialogue_text = "You found the Golden Pencil! Nice work."
+
+                            else:
+                                dialogue_text = npc["dialogue"]
 
                             show_dialogue = True
 
@@ -1145,6 +1190,35 @@ while running:
                     and physics_minigame_close.collidepoint(event.pos)
                 ):
                     show_physics_minigame = False
+
+                # TOILET MINIGAME CLOSE
+
+                if (
+                    show_toilet_minigame
+                    and toilet_close_button.collidepoint(event.pos)
+                ):
+                    show_toilet_minigame = False
+
+                # SEARCH TOILETS
+
+                if show_toilet_minigame:
+
+                    for i, button in enumerate(toilet_buttons):
+
+                        if button.collidepoint(event.pos):
+
+                            if i == special_toilet:
+
+                                if not golden_pencil_found:
+                                    toilet_result = "You found the Golden Pencil! Congratulations!"
+                                    golden_pencil_found = True
+
+                                else:
+                                    toilet_result = "You already found it!"
+
+                            else:
+
+                                toilet_result = "Nothing here..."
 
 
                 # PICK UP CHEMISTRY COLOUR
@@ -1375,16 +1449,14 @@ while running:
 
         interactable_rect = pygame.Rect(
 
-            interactable["x"],
+            interactable["x"] + INTERACTABLE_OFFSET_X,
 
-            interactable["y"],
+            interactable["y"] + INTERACTABLE_OFFSET_Y,
 
             32,
 
             32
-
         )
-
 
         distance_x = abs(
 
@@ -2854,6 +2926,145 @@ while running:
             (
                 physics_minigame_close.centerx - close_text.get_width() // 2,
                 physics_minigame_close.centery - close_text.get_height() // 2
+            )
+        )
+
+
+    # --------------------------------------------------
+    # DRAW TOILET SEARCH MINIGAME
+    # --------------------------------------------------
+
+    if show_toilet_minigame:
+
+        toilet_panel = pygame.Rect(
+            220,
+            170,
+            WIDTH - 440,
+            HEIGHT - 340
+        )
+
+        # PANEL
+        pygame.draw.rect(
+            screen,
+            (240, 236, 220),
+            toilet_panel,
+            border_radius=18
+        )
+
+        pygame.draw.rect(
+            screen,
+            (50, 50, 50),
+            toilet_panel,
+            4,
+            border_radius=18
+        )
+
+        # TITLE
+        title_surface = font.render(
+            "Search the Toilets",
+            True,
+            (25, 25, 25)
+        )
+
+        screen.blit(
+            title_surface,
+            (
+                toilet_panel.centerx - title_surface.get_width() // 2,
+                toilet_panel.y + 30
+            )
+        )
+
+        # INSTRUCTION
+        instruction_surface = small_font.render(
+            "One toilet contains a special item...",
+            True,
+            (70, 70, 70)
+        )
+
+        screen.blit(
+            instruction_surface,
+            (
+                toilet_panel.centerx - instruction_surface.get_width() // 2,
+                toilet_panel.y + 80
+            )
+        )
+
+        # TOILET BUTTONS
+        for i, button in enumerate(toilet_buttons):
+
+            pygame.draw.rect(
+                screen,
+                (215, 215, 205),
+                button,
+                border_radius=12
+            )
+
+            pygame.draw.rect(
+                screen,
+                (40, 40, 40),
+                button,
+                3,
+                border_radius=12
+            )
+
+            toilet_text = small_font.render(
+                "Toilet " + str(i + 1),
+                True,
+                (25, 25, 25)
+            )
+
+            screen.blit(
+                toilet_text,
+                (
+                    button.centerx - toilet_text.get_width() // 2,
+                    button.centery - toilet_text.get_height() // 2
+                )
+            )
+
+        # RESULT MESSAGE
+        if toilet_result != "":
+
+            result_surface = small_font.render(
+                toilet_result,
+                True,
+                (25, 25, 25)
+            )
+
+            screen.blit(
+                result_surface,
+                (
+                    toilet_panel.centerx - result_surface.get_width() // 2,
+                    toilet_panel.bottom - 80
+                )
+            )
+
+        # CLOSE BUTTON
+        pygame.draw.rect(
+            screen,
+            (210, 210, 195),
+            toilet_close_button,
+            border_radius=8
+        )
+
+        pygame.draw.rect(
+            screen,
+            (40, 40, 40),
+            toilet_close_button,
+            2,
+            border_radius=8
+        )
+
+        close_text = small_font.render(
+            "Close",
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            close_text,
+            (
+                toilet_close_button.centerx - close_text.get_width() // 2,
+                toilet_close_button.centery - close_text.get_height() // 2
             )
         )
 
