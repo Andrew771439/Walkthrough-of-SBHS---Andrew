@@ -268,6 +268,42 @@ print(
     player_y
 )
 
+# --------------------------------------------------
+# MOCK TELEPORT SCREEN
+# --------------------------------------------------
+
+show_next_area = False
+show_teleport_prompt = False
+was_in_teleport = False
+
+teleport_yes_button = pygame.Rect(
+    WIDTH // 2 - 130,
+    HEIGHT // 2 + 40,
+    110,
+    50
+)
+
+teleport_no_button = pygame.Rect(
+    WIDTH // 2 + 20,
+    HEIGHT // 2 + 40,
+    110,
+    50
+)
+
+teleport_rect = pygame.Rect(
+    1472,
+    512,
+    80,
+    80
+)
+
+finish_tour_button = pygame.Rect(
+    WIDTH // 2 - 110,
+    HEIGHT // 2 + 100,
+    220,
+    60
+)
+
 
 # --------------------------------------------------
 # PLAYER
@@ -1153,6 +1189,23 @@ while running:
 
             if event.button == 1:
 
+                # TELEPORT YES / NO BUTTONS
+
+                if show_teleport_prompt:
+
+                    if teleport_yes_button.collidepoint(event.pos):
+                        show_teleport_prompt = False
+                        show_next_area = True
+
+                    elif teleport_no_button.collidepoint(event.pos):
+                        show_teleport_prompt = False
+
+                elif (
+                    show_next_area
+                    and finish_tour_button.collidepoint(event.pos) # type: ignore
+                ):
+                    running = False
+
                 # BIOLOGY MINIGAME CLOSE
 
                 if (
@@ -1376,6 +1429,18 @@ while running:
     move_player_y(
         move_y
     )
+
+    in_teleport = player_rect.colliderect(teleport_rect)
+
+    if (
+        in_teleport
+        and not was_in_teleport
+        and not show_next_area
+    ):
+        show_teleport_prompt = True
+
+    was_in_teleport = in_teleport
+    
 
 
     # NPC dialogue disappears when walking
@@ -3068,6 +3133,147 @@ while running:
             )
         )
 
+
+    # --------------------------------------------------
+    # DRAW TELEPORT PROMPT
+    # --------------------------------------------------
+
+    if show_teleport_prompt:
+
+        prompt_box = pygame.Rect(
+            WIDTH // 2 - 260,
+            HEIGHT // 2 - 120,
+            520,
+            240
+        )
+
+        pygame.draw.rect(
+            screen,
+            (240, 236, 220),
+            prompt_box,
+            border_radius=15
+        )
+
+        pygame.draw.rect(
+            screen,
+            (40, 40, 40),
+            prompt_box,
+            4,
+            border_radius=15
+        )
+
+        prompt_title = font.render(
+            "Travel to DTC & Art Block? No turning back!",
+            True,
+            (25, 25, 25)
+        )
+
+        screen.blit(
+            prompt_title,
+            (
+                prompt_box.centerx - prompt_title.get_width() // 2,
+                prompt_box.y + 40
+            )
+        )
+
+        pygame.draw.rect(
+            screen,
+            (210, 230, 210),
+            teleport_yes_button,
+            border_radius=8
+        )
+
+        pygame.draw.rect(
+            screen,
+            (230, 210, 210),
+            teleport_no_button,
+            border_radius=8
+        )
+
+        yes_text = small_font.render(
+            "Yes",
+            True,
+            (20, 20, 20)
+        )
+
+        no_text = small_font.render(
+            "No",
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            yes_text,
+            (
+                teleport_yes_button.centerx - yes_text.get_width() // 2,
+                teleport_yes_button.centery - yes_text.get_height() // 2
+            )
+        )
+
+        screen.blit(
+            no_text,
+            (
+                teleport_no_button.centerx - no_text.get_width() // 2,
+                teleport_no_button.centery - no_text.get_height() // 2
+            )
+        )
+
+    # --------------------------------------------------
+    # DRAW NEXT AREA SCREEN
+    # --------------------------------------------------
+
+    if show_next_area:
+
+        screen.fill((35, 45, 40))
+
+        title = font.render(
+            "DTC & ART BLOCK",
+            True,
+            (255, 255, 255)
+        )
+
+        screen.blit(
+            title,
+            (
+                WIDTH // 2 - title.get_width() // 2,
+                HEIGHT // 2 - 120
+            )
+        )
+
+        message = small_font.render(
+            "This area is still under construction, I hope you enjoyed the Science Block!",
+            True,
+            (230, 230, 230)
+        )
+
+        screen.blit(
+            message,
+            (
+                WIDTH // 2 - message.get_width() // 2,
+                HEIGHT // 2 - 50
+            )
+        )
+
+        pygame.draw.rect(
+            screen,
+            (220, 220, 200),
+            finish_tour_button,
+            border_radius=10
+        )
+
+        finish_text = small_font.render(
+            "Finish Tour",
+            True,
+            (30, 30, 30)
+        )
+
+        screen.blit(
+            finish_text,
+            (
+                finish_tour_button.centerx - finish_text.get_width() // 2,
+                finish_tour_button.centery - finish_text.get_height() // 2
+            )
+        )
 
     # --------------------------------------------------
     # UPDATE DISPLAY
