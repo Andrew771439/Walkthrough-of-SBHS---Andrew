@@ -691,6 +691,50 @@ chemistry_close_button = pygame.Rect(
 
 chemistry_mix_colour = (240, 240, 240)
 
+# --------------------------------------------------
+# PHYSICS FORCE MINIGAME
+# --------------------------------------------------
+
+show_physics_minigame = False
+
+physics_dragging = None
+physics_result = ""         
+
+physics_box_rect = pygame.Rect(
+    WIDTH // 2 - 100,
+    300,
+    200,
+    180
+)
+
+physics_items = [
+    {
+        "name": "Left",
+        "rect": pygame.Rect(WIDTH // 2 - 265, 500, 150, 60),
+        "start_x": WIDTH // 2 - 265,
+        "start_y": 500
+    },
+    {
+        "name": "Right",
+        "rect": pygame.Rect(WIDTH // 2 - 75, 500, 150, 60),
+        "start_x": WIDTH // 2 - 75,
+        "start_y": 500
+    },
+    {
+        "name": "Up",
+        "rect": pygame.Rect(WIDTH // 2 + 115, 500, 150, 60),
+        "start_x": WIDTH // 2 + 115,
+        "start_y": 500
+    }
+]
+
+physics_minigame_close = pygame.Rect(
+    WIDTH - 290,
+    170,
+    90,
+    40
+)
+
 
 # --------------------------------------------------
 # MAIN LOOP
@@ -830,6 +874,25 @@ while running:
                                 item["rect"].x = item["start_x"]
                                 item["rect"].y = item["start_y"]
 
+                        elif interactable["id"] == "Physics_experiment":
+
+                            show_biology_question = False
+                            show_physics_question = False
+                            show_biology_minigame = False
+                            show_chemistry_minigame = False
+
+                            show_physics_minigame = True
+
+                            physics_dragging = None
+                            physics_result = ""
+
+                            for item in physics_items:
+                                item["rect"].x = item["start_x"]
+                                item["rect"].y = item["start_y"]
+
+                            physics_box_rect.x = WIDTH // 2 - 100
+                            physics_box_rect.y = 300
+
                         break
 
 
@@ -911,6 +974,12 @@ while running:
             ):
 
                 chemistry_colours[chemistry_dragging]["rect"].center = event.pos
+
+            if (
+                show_physics_minigame
+                and physics_dragging is not None
+            ):
+                physics_items[physics_dragging]["rect"].center = event.pos
 
         if event.type == pygame.MOUSEBUTTONUP:
             if (
@@ -1009,7 +1078,33 @@ while running:
 
                 chemistry_dragging = None
 
+            # PHYSICS FORCE DROP
+
+            if (
+                event.button == 1
+                and show_physics_minigame
+                and physics_dragging is not None
+            ):
+
+                item = physics_items[physics_dragging]
+
+                if item["rect"].colliderect(physics_box_rect):
+
+                    if item["name"] == "Right":
+                        physics_result = "Correct! The box moves right."
+                        physics_box_rect.x += 120
+
+                    else:
+                        physics_result = "Try again!"
+
+                item["rect"].x = item["start_x"]
+                item["rect"].y = item["start_y"]
+
+                physics_dragging = None
+
         if event.type == pygame.MOUSEBUTTONDOWN:
+
+
 
             if event.button == 1:
 
@@ -1043,6 +1138,14 @@ while running:
                 ):
                     show_chemistry_minigame = False
 
+                # PHYSICS MINIGAME CLOSE
+
+                if (
+                    show_physics_minigame
+                    and physics_minigame_close.collidepoint(event.pos)
+                ):
+                    show_physics_minigame = False
+
 
                 # PICK UP CHEMISTRY COLOUR
 
@@ -1056,6 +1159,17 @@ while running:
                         if item["rect"].collidepoint(event.pos):
 
                             chemistry_dragging = i
+                            break
+
+                # PICK UP PHYSICS FORCE
+
+                if show_physics_minigame:
+
+                    for i, item in enumerate(physics_items):
+
+                        if item["rect"].collidepoint(event.pos):
+
+                            physics_dragging = i
                             break
         
 
@@ -2463,6 +2577,284 @@ while running:
 
             )
 
+        )
+
+    # --------------------------------------------------
+    # DRAW PHYSICS FORCE MINIGAME
+    # --------------------------------------------------
+
+    if show_physics_minigame:
+
+        physics_panel = pygame.Rect(
+            180,
+            150,
+            WIDTH - 360,
+            HEIGHT - 280
+        )
+
+        # MAIN PANEL
+        pygame.draw.rect(
+            screen,
+            (240, 236, 220),
+            physics_panel,
+            border_radius=18
+        )
+
+        pygame.draw.rect(
+            screen,
+            (57, 65, 26),
+            physics_panel,
+            5,
+            border_radius=18
+        )
+
+        # TITLE
+        title_surface = font.render(
+            "Physics Minigame",
+            True,
+            (30, 30, 30)
+        )
+
+        screen.blit(
+            title_surface,
+            (
+                physics_panel.centerx - title_surface.get_width() // 2,
+                physics_panel.y + 25
+            )
+        )
+
+        # QUESTION
+        question_surface = small_font.render(
+            "Which force would move the box to the right?",
+            True,
+            (30, 30, 30)
+        )
+
+        screen.blit(
+            question_surface,
+            (
+                physics_panel.centerx - question_surface.get_width() // 2,
+                physics_panel.y + 80
+            )
+        )
+
+        # INSTRUCTION
+        instruction_surface = small_font.render(
+            "Drag the correct arrow onto the box",
+            True,
+            (80, 80, 80)
+        )
+
+        screen.blit(
+            instruction_surface,
+            (
+                physics_panel.centerx - instruction_surface.get_width() // 2,
+                physics_panel.y + 115
+            )
+        )
+
+        # --------------------------------------------------
+        # CRATE / BOX
+        # --------------------------------------------------
+
+        pygame.draw.rect(
+            screen,
+            (155, 105, 60),
+            physics_box_rect,
+            border_radius=8
+        )
+
+        pygame.draw.rect(
+            screen,
+            (70, 45, 25),
+            physics_box_rect,
+            4,
+            border_radius=8
+        )
+
+        pygame.draw.line(
+            screen,
+            (95, 60, 30),
+            physics_box_rect.topleft,
+            physics_box_rect.bottomright,
+            7
+        )
+
+        pygame.draw.line(
+            screen,
+            (95, 60, 30),
+            physics_box_rect.topright,
+            physics_box_rect.bottomleft,
+            7
+        )
+
+        box_text = small_font.render(
+            "BOX",
+            True,
+            (255, 255, 255)
+        )
+
+        screen.blit(
+            box_text,
+            (
+                physics_box_rect.centerx - box_text.get_width() // 2,
+                physics_box_rect.centery - box_text.get_height() // 2
+            )
+        )
+
+        # --------------------------------------------------
+        # FORCE CHOICES
+        # --------------------------------------------------
+
+        for item in physics_items:
+
+            pygame.draw.rect(
+                screen,
+                (225, 222, 205),
+                item["rect"],
+                border_radius=10
+            )
+
+            pygame.draw.rect(
+                screen,
+                (50, 50, 50),
+                item["rect"],
+                3,
+                border_radius=10
+            )
+
+            center_x = item["rect"].centerx
+            center_y = item["rect"].centery - 5
+
+            # LEFT ARROW
+            if item["name"] == "Left":
+
+                pygame.draw.line(
+                    screen,
+                    (190, 60, 60),
+                    (center_x + 25, center_y),
+                    (center_x - 20, center_y),
+                    8
+                )
+
+                pygame.draw.polygon(
+                    screen,
+                    (190, 60, 60),
+                    [
+                        (center_x - 30, center_y),
+                        (center_x - 10, center_y - 15),
+                        (center_x - 10, center_y + 15)
+                    ]
+                )
+
+            # RIGHT ARROW
+            elif item["name"] == "Right":
+
+                pygame.draw.line(
+                    screen,
+                    (60, 100, 200),
+                    (center_x - 25, center_y),
+                    (center_x + 20, center_y),
+                    8
+                )
+
+                pygame.draw.polygon(
+                    screen,
+                    (60, 100, 200),
+                    [
+                        (center_x + 30, center_y),
+                        (center_x + 10, center_y - 15),
+                        (center_x + 10, center_y + 15)
+                    ]
+                )
+
+            # UP ARROW
+            elif item["name"] == "Up":
+
+                pygame.draw.line(
+                    screen,
+                    (70, 160, 80),
+                    (center_x, center_y + 20),
+                    (center_x, center_y - 20),
+                    8
+                )
+
+                pygame.draw.polygon(
+                    screen,
+                    (70, 160, 80),
+                    [
+                        (center_x, center_y - 30),
+                        (center_x - 15, center_y - 10),
+                        (center_x + 15, center_y - 10)
+                    ]
+                )
+
+            # LABEL
+            item_text = small_font.render(
+                item["name"],
+                True,
+                (25, 25, 25)
+            )
+
+            screen.blit(
+                item_text,
+                (
+                    item["rect"].centerx - item_text.get_width() // 2,
+                    item["rect"].bottom - 25
+                )
+            )
+
+        # --------------------------------------------------
+        # RESULT MESSAGE
+        # --------------------------------------------------
+
+        if physics_result != "":
+
+            result_surface = small_font.render(
+                physics_result,
+                True,
+                (25, 25, 25)
+            )
+
+            screen.blit(
+                result_surface,
+                (
+                    physics_panel.centerx - result_surface.get_width() // 2,
+                    physics_panel.bottom - 70
+                )
+            )
+
+        # --------------------------------------------------
+        # CLOSE BUTTON
+        # --------------------------------------------------
+
+        pygame.draw.rect(
+            screen,
+            (210, 210, 195),
+            physics_minigame_close,
+            border_radius=8
+        )
+
+        pygame.draw.rect(
+            screen,
+            (40, 40, 40),
+            physics_minigame_close,
+            2,
+            border_radius=8
+        )
+
+        close_text = small_font.render(
+            "Close",
+            True,
+            (20, 20, 20)
+        )
+
+        screen.blit(
+            close_text,
+            (
+                physics_minigame_close.centerx - close_text.get_width() // 2,
+                physics_minigame_close.centery - close_text.get_height() // 2
+            )
         )
 
 
