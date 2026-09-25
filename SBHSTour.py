@@ -242,6 +242,7 @@ player_right_sheet = pygame.image.load(
 ).convert_alpha()
 
 def split_spritesheet(sheet, frame_width, frame_height, frame_count):
+    # Split one horizontal spritesheet into individually scaled animation frames.
 
     frames = []
 
@@ -433,6 +434,7 @@ player_rect = pygame.Rect(
 # --------------------------------------------------
 
 def move_player_x(amount):
+    # Move horizontally, then stop the player at the first wall they touch.
 
     player_rect.x += amount
 
@@ -448,6 +450,7 @@ def move_player_x(amount):
 
 
 def move_player_y(amount):
+    # Move vertically, then stop the player at the first wall they touch.
 
     player_rect.y += amount
 
@@ -543,6 +546,9 @@ for layer in science_level["layerInstances"]:
                     elif field["__identifier"] == "message":
 
                         interaction_message = field["__value"]
+
+                if interaction_id == "Bin":
+                  continue
 
 
                 interactables.append({
@@ -937,6 +943,7 @@ while running:
     # --------------------------------------------------
 
     for event in pygame.event.get():
+        # Process window, keyboard, mouse, and minigame events once per frame.
 
 
         if event.type == pygame.QUIT:
@@ -966,6 +973,7 @@ while running:
             # ------------------------------------------
 
             if event.key == pygame.K_e:
+                # E interacts with the nearest valid object before checking NPCs.
 
 
                 interaction_found = False
@@ -1017,6 +1025,7 @@ while running:
                         interaction_found = True
 
                         if interactable["id"] == "biology_question":
+                            # Open the biology quiz and close other activities.
                             show_biology_question = True
                             show_physics_question = False
                             show_biology_minigame = False
@@ -1029,6 +1038,7 @@ while running:
                             physics_result = ""
 
                         elif interactable["id"] == "biology_experiment":
+                            # Reset the biology experiment whenever it is opened.
                             show_biology_question = False
                             show_physics_question = False
                             show_biology_minigame = True
@@ -1043,6 +1053,7 @@ while running:
                                 item["rect"].y = item["start_y"]
 
                         elif interactable["id"] == "chemistry_experiment":
+                            # Reset the colour mixing experiment to its first target.
 
                             show_biology_question = False
                             show_physics_question = False
@@ -1060,6 +1071,7 @@ while running:
                                 item["rect"].y = item["start_y"]
 
                         elif interactable["id"] == "Physics_experiment":
+                            # Reset the force experiment and return the box to its start.
 
                             show_biology_question = False
                             show_physics_question = False
@@ -1079,6 +1091,7 @@ while running:
                             physics_box_rect.y = 300
 
                         elif interactable["id"] == "Golden_pencil":
+                            # Open the toilet search activity.
 
                             show_biology_question = False
                             show_physics_question = False
@@ -1163,6 +1176,7 @@ while running:
         # ----------------------------------------------
 
         if event.type == pygame.MOUSEMOTION:
+            # Keep a selected draggable item underneath the mouse cursor.
 
             if (
                 show_biology_minigame
@@ -1185,6 +1199,7 @@ while running:
                 physics_items[physics_dragging]["rect"].center = event.pos
 
         if event.type == pygame.MOUSEBUTTONUP:
+            # Resolve a biology, chemistry, or physics drag when the mouse is released.
             if (
                 event.button == 1
                 and show_biology_minigame
@@ -1231,6 +1246,7 @@ while running:
                         chemistry_mix_colour = item["colour"]
 
                     if len(chemistry_selected) == 2:
+                        # Two selected colours are compared with the current target mix.
 
                         mix = set(chemistry_selected)
                         result_name = ""
@@ -1524,6 +1540,7 @@ while running:
     # --------------------------------------------------
 
     keys = pygame.key.get_pressed()
+    # Read held movement keys and convert them into a frame-by-frame displacement.
 
 
     move_x = 0
@@ -1547,6 +1564,7 @@ while running:
         player_direction = "right"
 
     if move_x != 0 or move_y != 0:
+        # Advance the walking animation only while the player is moving.
 
         player_animation_timer += 1
 
@@ -1719,6 +1737,8 @@ while running:
     # CAMERA
     # --------------------------------------------------
 
+    # Keep the camera centred on the player while preventing it from leaving the map.
+
     camera_x = (
         player_rect.centerx
         -
@@ -1773,6 +1793,8 @@ while running:
     # DRAW MAP
     # --------------------------------------------------
 
+    # Draw the world first so player and interface elements appear on top of it.
+
     screen.fill(
         (30, 30, 30)
     )
@@ -1793,6 +1815,8 @@ while running:
     # --------------------------------------------------
     # DRAW PLAYER
     # --------------------------------------------------
+
+    # Select the animation frames for the current facing direction.
 
     if player_direction == "front":
         current_player_image = player_front_frames[player_frame]
@@ -1945,6 +1969,8 @@ while running:
     # --------------------------------------------------
     # INTERACTION PROMPT
     # --------------------------------------------------
+
+    # Show the action available at the nearest NPC or interactable.
 
     if (
         (
@@ -3617,6 +3643,8 @@ while running:
     # --------------------------------------------------
     # UPDATE DISPLAY
     # --------------------------------------------------
+
+    # Present the completed frame and limit the game loop to 60 frames per second.
 
     pygame.display.flip()
 
