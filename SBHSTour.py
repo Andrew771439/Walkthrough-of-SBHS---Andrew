@@ -1864,6 +1864,87 @@ while running:
 
         )
 
+    # DRAW ACTIVITY MARKERS
+    # --------------------------------------------------
+
+    for interactable in interactables:
+
+        marker = None
+        marker_colour = (255, 255, 255)
+
+        if interactable["id"] in [
+            "biology_question",
+            "physics_question"
+        ]:
+            marker = "?"
+            marker_colour = (120, 200, 255)
+
+        elif interactable["id"] in [
+            "biology_experiment",
+            "chemistry_experiment",
+            "Physics_experiment"
+        ]:
+            marker = "!"
+            marker_colour = (255, 210, 90)
+
+        elif interactable["id"] == "Golden_pencil":
+            marker = "*"
+            marker_colour = (255, 230, 90)
+
+        if marker is not None:
+
+            marker_x = (
+                interactable["x"]
+                + INTERACTABLE_OFFSET_X
+                - camera_x
+            )
+
+            marker_y = (
+                interactable["y"]
+                + INTERACTABLE_OFFSET_Y
+                - camera_y
+                - 0
+            )
+
+            marker_box = pygame.Rect(
+                marker_x - 16,
+                marker_y - 16,
+                32,
+                32
+            )
+
+            pygame.draw.rect(
+                screen,
+                (30, 30, 30),
+                marker_box,
+                border_radius=8
+            )
+
+            pygame.draw.rect(
+                screen,
+                marker_colour,
+                marker_box,
+                2,
+                border_radius=8
+            )
+
+            marker_surface = font.render(
+                marker,
+                True,
+                marker_colour
+            )
+
+            screen.blit(
+                marker_surface,
+                (
+                    marker_box.centerx
+                    - marker_surface.get_width() // 2,
+
+                    marker_box.centery
+                    - marker_surface.get_height() // 2
+                )
+            )
+
 
     # --------------------------------------------------
     # INTERACTION PROMPT
