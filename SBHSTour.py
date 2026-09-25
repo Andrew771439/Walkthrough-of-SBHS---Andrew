@@ -5,7 +5,7 @@ import os
 pygame.init()
 
 
-class pos:
+class pos:   
     """Small reusable 2-D position value used by the tour."""
 
     def __init__(self, x=0, y=0):
@@ -241,7 +241,7 @@ player_right_sheet = pygame.image.load(
     player_right_path
 ).convert_alpha()
 
-def split_spritesheet(sheet, frame_width, frame_height, frame_count):
+def split_spritesheet(sheet, frame_width, frame_height, frame_count):   #USed AI alot here to help with sprite set up and animation difficulties.
     # Split one horizontal spritesheet into individually scaled animation frames.
 
     frames = []
@@ -432,6 +432,8 @@ player_rect = pygame.Rect(
 # --------------------------------------------------
 # COLLISION FUNCTIONS
 # --------------------------------------------------
+
+#USed Ai a little and COnners code help to create the collision functions for the player movement and wall collisions.
 
 def move_player_x(amount):
     # Move horizontally, then stop the player at the first wall they touch.
@@ -750,6 +752,7 @@ physics_close_button = pygame.Rect(
 # BIOLOGY TREE MINIGAME
 # --------------------------------------------------
 
+#USed AI for first mini-game to give me an idea on how to do it
 show_biology_minigame = False
 
 biology_stage = 0
@@ -1174,6 +1177,8 @@ while running:
         # ----------------------------------------------
         # MOUSE movement and clicks
         # ----------------------------------------------
+
+    #USED AI FOR FIRST MOUSE MOTION AND W3SCHOOLS TO UNDERSTAND HOW DRAG AND DROP WORKS AND HOW TO IMPLEMENT IT INTO THE MINIGAMES.
 
         if event.type == pygame.MOUSEMOTION:
             # Keep a selected draggable item underneath the mouse cursor.
@@ -1794,6 +1799,7 @@ while running:
     # --------------------------------------------------
 
     # Draw the world first so player and interface elements appear on top of it.
+    #USED AI TO HELP ME UNDERSTAND HOW TO DRAW THE MAP AND HOW TO IMPLEMENT IT INTO THE GAME. WAS ABLE TO UNDERSTAND AND USE FOR A WHOLE LOT OF OTHER THINGS.
 
     screen.fill(
         (30, 30, 30)
