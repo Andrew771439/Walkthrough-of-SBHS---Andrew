@@ -35,7 +35,8 @@ class pos:
 
 # --------------------------------------------------
 # WINDOW
-# --------------------------------------------------
+# --------------------------------------------------              #AI HELPED ME DEBUG AND TIDY CODE
+                                                                #AI HELPED ME FIX INDENTATION AND ORGANISE CODE BETTER
 
 WIDTH = 1580
 HEIGHT = 920
