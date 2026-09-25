@@ -362,8 +362,8 @@ for layer in science_level["layerInstances"]:
                         field["__value"] == "Science_Block_Initial"
                     ):
 
-                        player_x = entity["px"][0]
-                        player_y = entity["px"][1]
+                        player_x = entity["px"][0] - 16
+                        player_y = entity["px"][1] - 32
 
 
 print(
@@ -1886,10 +1886,6 @@ while running:
         ]:
             marker = "!"
             marker_colour = (255, 210, 90)
-
-        elif interactable["id"] == "Golden_pencil":
-            marker = "*"
-            marker_colour = (255, 230, 90)
 
         if marker is not None:
 
