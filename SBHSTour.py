@@ -242,7 +242,7 @@ player_right_sheet = pygame.image.load(
     player_right_path
 ).convert_alpha()
 
-def split_spritesheet(sheet, frame_width, frame_height, frame_count):   #USed AI alot here to help with sprite set up and animation difficulties.
+def split_spritesheet(sheet, frame_width, frame_height, frame_count):   #USed AI here to help with sprite set up and animation difficulties.
     # Split one horizontal spritesheet into individually scaled animation frames.
 
     frames = []
@@ -434,7 +434,7 @@ player_rect = pygame.Rect(
 # COLLISION FUNCTIONS
 # --------------------------------------------------
 
-#USed Ai a little and COnners code help to create the collision functions for the player movement and wall collisions.
+#USed Conners code help to create the collision functions for the player movement and wall collisions.
 
 def move_player_x(amount):
     # Move horizontally, then stop the player at the first wall they touch.
@@ -753,7 +753,7 @@ physics_close_button = pygame.Rect(
 # BIOLOGY TREE MINIGAME
 # --------------------------------------------------
 
-#USed AI for first mini-game to give me an idea on how to do it
+#USed Conners code help to create the collision functions for the player movement and wall collisions.
 show_biology_minigame = False
 
 biology_stage = 0
@@ -1546,31 +1546,43 @@ while running:
     # --------------------------------------------------
 
     keys = pygame.key.get_pressed()
-    # Read held movement keys and convert them into a frame-by-frame displacement.
-
 
     move_x = 0
     move_y = 0
 
+    # Stop background movement whenever a screen/task is open
+    overlay_open = (
+        show_dialogue
+        or show_biology_question
+        or show_physics_question
+        or show_biology_minigame
+        or show_chemistry_minigame
+        or show_physics_minigame
+        or show_toilet_minigame
+        or show_teleport_prompt
+        or show_next_area
+        or show_welcome
+    )
 
-    if keys[pygame.K_w]:
-        move_y -= PLAYER_SPEED
-        player_direction = "back"
+    if not overlay_open:
 
-    if keys[pygame.K_s]:
-        move_y += PLAYER_SPEED
-        player_direction = "front"
+        if keys[pygame.K_w]:
+            move_y -= PLAYER_SPEED
+            player_direction = "back"
 
-    if keys[pygame.K_a]:
-        move_x -= PLAYER_SPEED
-        player_direction = "left"
+        if keys[pygame.K_s]:
+            move_y += PLAYER_SPEED
+            player_direction = "front"
 
-    if keys[pygame.K_d]:
-        move_x += PLAYER_SPEED
-        player_direction = "right"
+        if keys[pygame.K_a]:
+            move_x -= PLAYER_SPEED
+            player_direction = "left"
+
+        if keys[pygame.K_d]:
+            move_x += PLAYER_SPEED
+            player_direction = "right"
 
     if move_x != 0 or move_y != 0:
-        # Advance the walking animation only while the player is moving.
 
         player_animation_timer += 1
 
@@ -1585,13 +1597,8 @@ while running:
         player_frame = 0
         player_animation_timer = 0
 
-    move_player_x(
-        move_x
-    )
-
-    move_player_y(
-        move_y
-    )
+    move_player_x(move_x)
+    move_player_y(move_y)
 
     in_teleport = player_rect.colliderect(teleport_rect)
 
