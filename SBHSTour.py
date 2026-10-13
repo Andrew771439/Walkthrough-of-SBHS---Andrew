@@ -867,6 +867,7 @@ chemistry_mix_colour = (240, 240, 240)
 # --------------------------------------------------
 
 show_physics_minigame = False
+physics_completed = False
 
 physics_dragging = None
 physics_result = ""         
@@ -1086,6 +1087,7 @@ while running:
 
                             physics_dragging = None
                             physics_result = ""
+                            physics_completed = False
 
                             for item in physics_items:
                                 item["rect"].x = item["start_x"]
@@ -1318,6 +1320,7 @@ while running:
                     if item["name"] == "Right":
                         physics_result = "Correct! The box moves right."
                         physics_box_rect.x += 120
+                        physics_completed = True
 
                     else:
                         physics_result = "Try again!"
@@ -1440,7 +1443,7 @@ while running:
 
                 # PICK UP PHYSICS FORCE
 
-                if show_physics_minigame:
+                if show_physics_minigame and not physics_completed:
 
                     for i, item in enumerate(physics_items):
 
@@ -3603,7 +3606,7 @@ while running:
             "WASD - Move",
             "E - Interact with teachers and objects",
             "Mouse - Click buttons and minigame options",
-            "Walk away from an NPC to close their dialogue",
+            "Click Close to exit dialogue",
             "",
             "Explore the Science Block, complete the activities,",
             "and make your way to the end of the tour."
